@@ -1,6 +1,8 @@
 package br.com.jsyoutube.app;
 import android.app.Activity;
 import android.os.Bundle;
+import android.app.PictureInPictureParams;
+import android.os.Build;
 import android.content.Intent;
 import android.net.Uri;
 import android.webkit.*;
@@ -140,6 +142,12 @@ public class MainActivity extends Activity {
    root.removeView(full);
    full=null;
    if(fullCallback!=null){fullCallback.onCustomViewHidden();fullCallback=null;}
+  }
+ }
+ @Override public void onUserLeaveHint(){
+  super.onUserLeaveHint();
+  if(Build.VERSION.SDK_INT>=26 && web!=null && web.getUrl()!=null && (web.getUrl().contains("watch?") || web.getUrl().contains("/shorts/"))){
+   try{enterPictureInPictureMode(new PictureInPictureParams.Builder().build());}catch(Exception ignored){}
   }
  }
  @Override public void onBackPressed(){
