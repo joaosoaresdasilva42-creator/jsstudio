@@ -25,7 +25,7 @@ public class MainActivity extends Activity {
  web.setWebViewClient(new WebViewClient(){
   @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request){
    Uri uri=request.getUrl(); String host=uri.getHost();
-   if(host!=null && (host.equals("doubleclick.net") || host.endsWith(".doubleclick.net") || host.equals("googlesyndication.com") || host.endsWith(".googlesyndication.com") || host.equals("googleadservices.com") || host.endsWith(".googleadservices.com"))){
+   if(host!=null && (blockedHost(host,"doubleclick.net") || blockedHost(host,"googlesyndication.com") || blockedHost(host,"googleadservices.com") || blockedHost(host,"google-analytics.com") || blockedHost(host,"googletagmanager.com") || blockedHost(host,"adservice.google.com") || blockedHost(host,"ads.youtube.com") || blockedHost(host,"adnxs.com") || blockedHost(host,"taboola.com") || blockedHost(host,"outbrain.com"))){
     return new WebResourceResponse("text/plain","UTF-8",new java.io.ByteArrayInputStream(new byte[0]));
    }
    return super.shouldInterceptRequest(view,request);
@@ -40,6 +40,7 @@ public class MainActivity extends Activity {
  web.requestFocus();
  go("https://m.youtube.com/");
  }
+ static boolean blockedHost(String host,String domain){return host.equals(domain)||host.endsWith("."+domain);}
  void closeFull(){if(full!=null){root.removeView(full);full=null;if(cb!=null)cb.onCustomViewHidden();}}
  @Override public void onBackPressed(){if(full!=null)closeFull();else if(web.canGoBack())web.goBack();else super.onBackPressed();}
 }
