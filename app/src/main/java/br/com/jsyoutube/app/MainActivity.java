@@ -18,7 +18,7 @@ public class MainActivity extends Activity {
  View full;
  WebChromeClient.CustomViewCallback fullCallback;
  boolean lite=false;
- boolean desktop=true;
+ boolean desktop=false;
  String mobileAgent;
  void applyLayout(){
   WebSettings s=web.getSettings();
@@ -40,7 +40,7 @@ public class MainActivity extends Activity {
  @Override public void onCreate(Bundle state){
   super.onCreate(state);
   lite=getPreferences(0).getBoolean("lite",false);
-  desktop=getPreferences(0).getBoolean("desktop",true);
+  desktop=getPreferences(0).getBoolean("desktop",false);
   root=new FrameLayout(this);
   setContentView(root);
   LinearLayout page=new LinearLayout(this);
@@ -99,9 +99,9 @@ public class MainActivity extends Activity {
   Button back=new Button(this);back.setText("Voltar");
   controls.addView(back,new LinearLayout.LayoutParams(0,-2,1));
   back.setOnClickListener(v->{if(web.canGoBack())web.goBack();});
-  Button official=new Button(this);official.setText("Original");
+  Button official=new Button(this);official.setText("Atualizar");
   controls.addView(official,new LinearLayout.LayoutParams(0,-2,1));
-  official.setOnClickListener(v->openOfficial());
+  official.setOnClickListener(v->web.reload());
 
   LinearLayout bottom=new LinearLayout(this);page.addView(bottom);
   CheckBox computer=new CheckBox(this);
