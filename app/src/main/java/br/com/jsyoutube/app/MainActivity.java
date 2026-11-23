@@ -22,7 +22,15 @@ public class MainActivity extends Activity {
 
  web=new WebView(this);page.addView(web,new LinearLayout.LayoutParams(-1,0,1));
  WebSettings s=web.getSettings();s.setJavaScriptEnabled(true);s.setDomStorageEnabled(true);s.setMediaPlaybackRequiresUserGesture(true);
- web.setWebViewClient(new WebViewClient(){@Override public boolean shouldOverrideUrlLoading(WebView v,WebResourceRequest r){Uri u=r.getUrl();String h=u.getHost();if(h!=null&&(h.equals("youtube.com")||h.endsWith(".youtube.com")||h.equals("youtu.be")||h.equals("accounts.google.com")))return false;try{startActivity(new Intent(Intent.ACTION_VIEW,u));}catch(Exception ignored){}return true;}});
+ web.setWebViewClient(new WebViewClient(){
+  @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request){
+   Uri uri=request.getUrl(); String host=uri.getHost();
+   if(host!=null && (host.equals("doubleclick.net") || host.endsWith(".doubleclick.net") || host.equals("googlesyndication.com") || host.endsWith(".googlesyndication.com") || host.equals("googleadservices.com") || host.endsWith(".googleadservices.com"))){
+    return new WebResourceResponse("text/plain","UTF-8",new java.io.ByteArrayInputStream(new byte[0]));
+   }
+   return super.shouldInterceptRequest(view,request);
+  }
+@Override public boolean shouldOverrideUrlLoading(WebView v,WebResourceRequest r){Uri u=r.getUrl();String h=u.getHost();if(h!=null&&(h.equals("youtube.com")||h.endsWith(".youtube.com")||h.equals("youtu.be")||h.equals("accounts.google.com")))return false;try{startActivity(new Intent(Intent.ACTION_VIEW,u));}catch(Exception ignored){}return true;}});
  web.setWebChromeClient(new WebChromeClient(){@Override public void onShowCustomView(View v,CustomViewCallback callback){full=v;cb=callback;root.addView(v,new FrameLayout.LayoutParams(-1,-1));}@Override public void onHideCustomView(){closeFull();}});
  LinearLayout nav=new LinearLayout(this);page.addView(nav);
  Button home=new Button(this);home.setText("Início");nav.addView(home,new LinearLayout.LayoutParams(0,-2,1));home.setOnClickListener(v->go("https://m.youtube.com/"));
