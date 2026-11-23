@@ -21,7 +21,7 @@ public class MainActivity extends Activity {
  search.setOnEditorActionListener((v,id,event)->{find.run();return true;});
 
  web=new WebView(this);page.addView(web,new LinearLayout.LayoutParams(-1,0,1));
- WebSettings s=web.getSettings();s.setJavaScriptEnabled(true);s.setDomStorageEnabled(true);s.setMediaPlaybackRequiresUserGesture(true);
+ WebSettings s=web.getSettings();s.setJavaScriptEnabled(true);s.setDomStorageEnabled(true);s.setMediaPlaybackRequiresUserGesture(true);s.setAllowFileAccess(false);s.setAllowContentAccess(false);s.setJavaScriptCanOpenWindowsAutomatically(false);s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);web.setWebContentsDebuggingEnabled(false);
  web.setWebViewClient(new WebViewClient(){
   @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request){
    Uri uri=request.getUrl(); String host=uri.getHost();
