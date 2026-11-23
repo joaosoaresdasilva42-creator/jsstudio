@@ -19,7 +19,7 @@ public class MainActivity extends Activity {
  search=new EditText(this);search.setSingleLine(true);search.setHint("Pesquisar no YouTube");search.setImeOptions(EditorInfo.IME_ACTION_SEARCH);top.addView(search,new LinearLayout.LayoutParams(0,-2,1));
  Runnable find=()->{try{go("https://m.youtube.com/results?search_query="+URLEncoder.encode(search.getText().toString(),"UTF-8"));}catch(Exception ignored){}};
  search.setOnEditorActionListener((v,id,event)->{find.run();return true;});
- Button btn=new Button(this);btn.setText("Buscar");top.addView(btn);btn.setOnClickListener(v->find.run());
+
  web=new WebView(this);page.addView(web,new LinearLayout.LayoutParams(-1,0,1));
  WebSettings s=web.getSettings();s.setJavaScriptEnabled(true);s.setDomStorageEnabled(true);s.setMediaPlaybackRequiresUserGesture(true);
  web.setWebViewClient(new WebViewClient(){@Override public boolean shouldOverrideUrlLoading(WebView v,WebResourceRequest r){Uri u=r.getUrl();String h=u.getHost();if(h!=null&&(h.equals("youtube.com")||h.endsWith(".youtube.com")||h.equals("youtu.be")||h.equals("accounts.google.com")))return false;try{startActivity(new Intent(Intent.ACTION_VIEW,u));}catch(Exception ignored){}return true;}});
@@ -29,6 +29,7 @@ public class MainActivity extends Activity {
  Button back=new Button(this);back.setText("Voltar");nav.addView(back,new LinearLayout.LayoutParams(0,-2,1));back.setOnClickListener(v->{if(web.canGoBack())web.goBack();});
  Button fav=new Button(this);fav.setText("Favorito");nav.addView(fav,new LinearLayout.LayoutParams(0,-2,1));fav.setOnClickListener(v->{String url=web.getUrl();if(url!=null&&url.startsWith("https://m.youtube.com/")){getPreferences(0).edit().putString("favorite",url).apply();Toast.makeText(this,"Salvo",0).show();}});
  Button saved=new Button(this);saved.setText("Salvos");nav.addView(saved,new LinearLayout.LayoutParams(0,-2,1));saved.setOnClickListener(v->go(getPreferences(0).getString("favorite","https://m.youtube.com/")));
+ web.requestFocus();
  go("https://m.youtube.com/");
  }
  void closeFull(){if(full!=null){root.removeView(full);full=null;if(cb!=null)cb.onCustomViewHidden();}}
