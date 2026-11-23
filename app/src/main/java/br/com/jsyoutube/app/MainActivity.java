@@ -15,7 +15,20 @@ public class MainActivity extends Activity {
  FrameLayout root;
  View full;
  WebChromeClient.CustomViewCallback fullCallback;
- boolean lite=true;
+ boolean lite=false;
+ boolean desktop=true;
+ String mobileAgent;
+ void applyLayout(){
+  WebSettings s=web.getSettings();
+  if(desktop){
+   s.setUserAgentString("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36");
+   s.setUseWideViewPort(true);s.setLoadWithOverviewMode(true);
+  } else {
+   s.setUserAgentString(mobileAgent);s.setUseWideViewPort(true);s.setLoadWithOverviewMode(true);
+  }
+  s.setLoadsImagesAutomatically(!lite);
+ }
+ String homeUrl(){return desktop?"https://www.youtube.com/":"https://m.youtube.com/";}
 
  void go(String url){ web.loadUrl(url); }
  void openOfficial(){
@@ -24,7 +37,8 @@ public class MainActivity extends Activity {
  }
  @Override public void onCreate(Bundle state){
   super.onCreate(state);
-  lite=getPreferences(0).getBoolean("lite",true);
+  lite=getPreferences(0).getBoolean("lite",false);
+  desktop=getPreferences(0).getBoolean("desktop",true);
   root=new FrameLayout(this);
   setContentView(root);
   LinearLayout page=new LinearLayout(this);
@@ -39,7 +53,7 @@ public class MainActivity extends Activity {
   search.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
   top.addView(search,new LinearLayout.LayoutParams(0,-2,1));
   Runnable find=()->{
-   try { go("https://m.youtube.com/results?search_query="+URLEncoder.encode(search.getText().toString(),"UTF-8")); }
+   try { go((desktop?"https://www.youtube.com/results?search_query=":"https://m.youtube.com/results?search_query=")+URLEncoder.encode(search.getText().toString(),"UTF-8")); }
    catch(Exception ignored){}
   };
   search.setOnEditorActionListener((v,id,event)->{find.run();return true;});
@@ -59,6 +73,7 @@ public class MainActivity extends Activity {
   settings.setJavaScriptCanOpenWindowsAutomatically(false);
   settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
   settings.setCacheMode(WebSettings.LOAD_DEFAULT);
+  mobileAgent=settings.getUserAgentString();
   web.setWebViewClient(new WebViewClient(){
    @Override public boolean shouldOverrideUrlLoading(WebView v,WebResourceRequest r){
     Uri u=r.getUrl();
@@ -78,7 +93,7 @@ public class MainActivity extends Activity {
   page.addView(controls);
   Button home=new Button(this);home.setText("Inicio");
   controls.addView(home,new LinearLayout.LayoutParams(0,-2,1));
-  home.setOnClickListener(v->go("https://m.youtube.com/"));
+  home.setOnClickListener(v->go(homeUrl()));
   Button back=new Button(this);back.setText("Voltar");
   controls.addView(back,new LinearLayout.LayoutParams(0,-2,1));
   back.setOnClickListener(v->{if(web.canGoBack())web.goBack();});
@@ -87,6 +102,13 @@ public class MainActivity extends Activity {
   official.setOnClickListener(v->openOfficial());
 
   LinearLayout bottom=new LinearLayout(this);page.addView(bottom);
+  CheckBox computer=new CheckBox(this);
+  computer.setText("PC");computer.setChecked(desktop);
+  bottom.addView(computer,new LinearLayout.LayoutParams(0,-2,1));
+  computer.setOnCheckedChangeListener((b,checked)->{
+   desktop=checked;getPreferences(0).edit().putBoolean("desktop",checked).apply();
+   applyLayout();go(homeUrl());
+  });
   CheckBox economy=new CheckBox(this);
   economy.setText("Economia de dados");
   economy.setChecked(lite);
@@ -102,16 +124,16 @@ public class MainActivity extends Activity {
   bottom.addView(favorite,new LinearLayout.LayoutParams(0,-2,1));
   favorite.setOnClickListener(v->{
    String u=web.getUrl();
-   if(u!=null && u.startsWith("https://m.youtube.com/")){
+   if(u!=null && (u.startsWith("https://m.youtube.com/")||u.startsWith("https://www.youtube.com/"))){
     getPreferences(0).edit().putString("favorite",u).apply();
     Toast.makeText(this,"Favorito salvo",Toast.LENGTH_SHORT).show();
    }
   });
   Button saved=new Button(this);saved.setText("Favorito");
   bottom.addView(saved,new LinearLayout.LayoutParams(0,-2,1));
-  saved.setOnClickListener(v->go(getPreferences(0).getString("favorite","https://m.youtube.com/")));
-  settings.setLoadsImagesAutomatically(!lite);
-  go("https://m.youtube.com/");
+  saved.setOnClickListener(v->go(getPreferences(0).getString("favorite",homeUrl())));
+  applyLayout();
+  go(homeUrl());
  }
  void closeFull(){
   if(full!=null){
